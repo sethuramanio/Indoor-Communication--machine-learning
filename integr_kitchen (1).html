@@ -1,0 +1,791 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>integr_kitchen</title><meta name="generator" content="MATLAB 9.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-04-19"><meta name="DC.source" content="integr_kitchen.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput">clc
+clear <span class="string">all</span>
+count=0;
+
+<span class="comment">%zone max dimensions</span>
+z_x=5;z_y=5;
+N1=(z_x-1);N2=(z_y-1);
+
+arr_x=[];
+arr_y=[];
+
+<span class="comment">% PART 2: best LED</span>
+
+photo=[0 0 160	209	223	221	201
+0 0 237	268	262	211	186
+0 0 266	273	271	269	198
+0 0 278	280	272	256	192
+0 0 192	262	248	237	178];
+
+kitchen=[0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5
+0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5
+0.5	0.5	4	0.5	0.5	0.5	0.5	0.5	4	0.5	0.5	0.5	0.5	0.5
+0.5	0.5	4	3	3	3	3	3	6	2	1	1	0.5	0.5
+0.5	0.5	1	0.5	0.5	0.5	0.5	0.5	4	3	3	3	0.5	0.5
+0.5	0.5	1	0.5	0.5	0.5	0.5	0.5	3	1	1	0.5	0.5	0.5
+0.5	0.5	3	2	2	2	2	2	3	1	1	0.5	0.5	0.5
+0.5	0.5	3	0.5	0.5	0.5	0.5	0.5	2	1	1	0.5	0.5	0.5
+0.5	0.5	4	1	1	1	1	1	2	3	4	4	0.5	0.5
+0.5	0.5	4	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5];
+
+
+z_best=zeros(500,1);
+
+
+<span class="comment">%PART 1 : Exhaustive zones' arrangement finding</span>
+
+	<span class="keyword">for</span> R1=1:7
+
+		<span class="keyword">for</span> C1=1:7
+
+			<span class="keyword">for</span> R2=(R1+1):(R1+8)
+
+				<span class="keyword">for</span> C2=1:7
+
+
+
+						<span class="keyword">for</span> C3=1:7
+
+							<span class="keyword">for</span> R4=1:7
+
+
+
+									<span class="keyword">for</span> R5=(R4+1):(R4+8)
+
+
+
+													<span class="keyword">if</span>(((R1-1)&lt;=N1)&amp;&amp;((R2-(R1+1))&lt;=N1)&amp;&amp;((14-(R2+1))&lt;=N1)&amp;&amp;((R4-(1))&lt;=N1)&amp;&amp;((R5-(R4+1))&lt;=N1)&amp;&amp;((14-(R5+1))&lt;=N1)&amp;&amp;((C1-(1))&lt;=N2)&amp;&amp;((C2-(1))&lt;=N2)&amp;&amp;((C3-(1))&lt;=N2)&amp;&amp;((10-(C1+1))&lt;=N2)&amp;&amp;((10-(C2+1))&lt;=N2)&amp;&amp;((10-(C3+1))&lt;=N2))
+														count=count+1;
+<span class="comment">%</span>
+
+														fprintf(<span class="string">"\nZones' Arrangement %d\n"</span>,count);
+														r1=1;c1=1;r2=(R1+1);c2=1;r3=(R2+1);R3=14;c3=1;r4=1;c4=(C1+1);C4=10;r5=(R4+1);c5=(C2+1);C5=10;r6=(R5+1);R6=14;c6=(C3+1);C6=10;
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+                                                        fprintf(<span class="string">"Region 1: rows' span:(%d, %d)  columns' span: (%d, %d)\n"</span>,r1,R1,c1,C1);
+														fprintf(<span class="string">"Region 2: rows' span:(%d, %d)  columns' span: (%d, %d)\n"</span>,r2,R2,c2,C2);
+														fprintf(<span class="string">"Region 3: rows' span:(%d, %d)  columns' span: (%d, %d)\n"</span>,r3,R3,c3,C3);
+														fprintf(<span class="string">"Region 4: rows' span:(%d, %d)  columns' span: (%d, %d)\n"</span>,r4,R4,c4,C4);
+														fprintf(<span class="string">"Region 5: rows' span:(%d, %d)  columns' span: (%d, %d)\n"</span>,r5,R5,c5,C5);
+														fprintf(<span class="string">"Region 6: rows' span:(%d, %d)  columns' span: (%d, %d)\n"</span>,r6,R6,c6,C6);
+<span class="comment">%Region 1</span>
+m=1;
+n=1;
+
+X1=zeros((C1-c1+1),(R1-r1+1));
+
+<span class="keyword">for</span> i=(11-C1):(11-c1)
+    n=1;
+    <span class="keyword">for</span> j=r1:R1
+
+        X1(m,n)=kitchen(i,j);
+        n=n+1;
+    <span class="keyword">end</span>
+    m=m+1;
+<span class="keyword">end</span>
+
+
+
+fil2_1=filter2(photo,X1);
+
+y1=max(max(fil2_1));
+
+[idx1_1 idx2_1]=find(fil2_1==y1);
+
+figure(count);
+blah=sprintf(<span class="string">"Kitchen\nZones' Arrangement %d"</span>,(count));
+sgt=sgtitle(blah);
+sgt.FontSize=15;
+
+subplot(2,3,4)
+surfl(fil2_1);
+title(<span class="string">'Region 1'</span>);
+zlabel(<span class="string">'Correlation matrix value'</span>);
+xlabel(<span class="string">'Local X'</span>,<span class="string">'Rotation'</span>,15);
+ylabel(<span class="string">'Local Y'</span>,<span class="string">'Rotation'</span>,-32);
+
+<span class="comment">%Region 2</span>
+m=1;
+n=1;
+
+X2=zeros((C2-c2+1),(R2-r2+1));
+
+<span class="keyword">for</span> i=(11-C2):(11-c2)
+    n=1;
+    <span class="keyword">for</span> j=r2:R2
+
+        X2(m,n)=kitchen(i,j);
+        n=n+1;
+    <span class="keyword">end</span>
+    m=m+1;
+<span class="keyword">end</span>
+
+
+
+fil2_2=filter2(photo,X2);
+
+y2=max(max(fil2_2));
+
+[idx1_2 idx2_2]=find(fil2_2==y2);
+
+subplot(2,3,5)
+surfl(fil2_2);
+title(<span class="string">'Region 2'</span>);
+zlabel(<span class="string">'Correlation matrix value'</span>);
+xlabel(<span class="string">'Local X'</span>,<span class="string">'Rotation'</span>,15);
+ylabel(<span class="string">'Local Y'</span>,<span class="string">'Rotation'</span>,-32);
+
+
+<span class="comment">%Region 3</span>
+m=1;
+n=1;
+
+X3=zeros((C3-c3+1),(R3-r3+1));
+
+<span class="keyword">for</span> i=(11-C3):(11-c3)
+    n=1;
+    <span class="keyword">for</span> j=r3:R3
+
+        X3(m,n)=kitchen(i,j);
+        n=n+1;
+    <span class="keyword">end</span>
+    m=m+1;
+<span class="keyword">end</span>
+
+
+
+fil2_3=filter2(photo,X3);
+
+y3=max(max(fil2_3));
+
+[idx1_3 idx2_3]=find(fil2_3==y3);
+
+subplot(2,3,6)
+surfl(fil2_3);
+zlabel(<span class="string">'Correlation matrix value'</span>);
+xlabel(<span class="string">'Local X'</span>,<span class="string">'Rotation'</span>,15);
+ylabel(<span class="string">'Local Y'</span>,<span class="string">'Rotation'</span>,-32);
+title(<span class="string">'Region 3'</span>);
+
+
+<span class="comment">%Region 4</span>
+m=1;
+n=1;
+
+X4=zeros((C4-c4+1),(R4-r4+1));
+
+<span class="keyword">for</span> i=(11-C4):(11-c4)
+    n=1;
+    <span class="keyword">for</span> j=r4:R4
+
+        X4(m,n)=kitchen(i,j);
+        n=n+1;
+    <span class="keyword">end</span>
+    m=m+1;
+<span class="keyword">end</span>
+
+
+
+fil2_4=filter2(photo,X4);
+
+y4=max(max(fil2_4));
+
+[idx1_4 idx2_4]=find(fil2_4==y4);
+
+subplot(2,3,1)
+surfl(fil2_4);
+title(<span class="string">'Region 4'</span>);
+zlabel(<span class="string">'Correlation matrix value'</span>);
+xlabel(<span class="string">'Local X'</span>,<span class="string">'Rotation'</span>,15);
+ylabel(<span class="string">'Local Y'</span>,<span class="string">'Rotation'</span>,-32);
+
+<span class="comment">%Region 5</span>
+m=1;
+n=1;
+
+X5=zeros((C5-c5+1),(R5-r5+1));
+
+<span class="keyword">for</span> i=(11-C5):(11-c5)
+    n=1;
+    <span class="keyword">for</span> j=r5:R5
+
+        X5(m,n)=kitchen(i,j);
+        n=n+1;
+    <span class="keyword">end</span>
+    m=m+1;
+<span class="keyword">end</span>
+
+
+
+
+fil2_5=filter2(photo,X5);
+
+y5=max(max(fil2_5));
+
+[idx1_5 idx2_5]=find(fil2_5==y5);
+
+subplot(2,3,2)
+surfl(fil2_5);
+title(<span class="string">'Region 5'</span>);
+zlabel(<span class="string">'Correlation matrix value'</span>);
+xlabel(<span class="string">'Local X'</span>,<span class="string">'Rotation'</span>,15);
+ylabel(<span class="string">'Local Y'</span>,<span class="string">'Rotation'</span>,-32);
+
+
+<span class="comment">%Region 6</span>
+m=1;
+n=1;
+
+X6=zeros((C6-c6+1),(R6-r6+1));
+
+<span class="keyword">for</span> i=(11-C6):(11-c6)
+    n=1;
+    <span class="keyword">for</span> j=r6:R6
+
+        X6(m,n)=kitchen(i,j);
+        n=n+1;
+    <span class="keyword">end</span>
+    m=m+1;
+<span class="keyword">end</span>
+
+
+
+fil2_6=filter2(photo,X6);
+
+y6=max(max(fil2_6));
+
+subplot(2,3,3)
+surfl(fil2_6);
+title(<span class="string">'Region 6'</span>);
+zlabel(<span class="string">'Correlation matrix value'</span>);
+xlabel(<span class="string">'Local X'</span>,<span class="string">'Rotation'</span>,15);
+ylabel(<span class="string">'Local Y'</span>,<span class="string">'Rotation'</span>,-32);
+
+[idx1_6 idx2_6]=find(fil2_6==y6);
+z_best(count)=(y1+y2+y3+y4+y5+y6);
+
+ idx_y=[idx1_1 idx1_2 idx1_3  idx1_4 idx1_5 idx1_6];
+ idx_x=[idx2_1 idx2_2 idx2_3  idx2_4 idx2_5 idx2_6];
+
+ arr_x=[arr_x;idx_x];
+ arr_y=[arr_y;idx_y];
+
+
+
+
+
+
+
+
+                                                    <span class="keyword">end</span>
+
+
+
+
+													 <span class="keyword">end</span>
+												 <span class="keyword">end</span>
+											<span class="keyword">end</span>
+										<span class="keyword">end</span>
+									<span class="keyword">end</span>
+								<span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+
+    best_z=max(z_best);
+    idx_z=[];
+idx_z=[idx_z;(find(z_best==best_z))];
+[cnt1,cnt2]=size(idx_z);
+cnt1;
+cnt2;
+
+fprintf(<span class="string">"\n\nRoom: Kitchen\n"</span>);
+
+
+<span class="keyword">for</span> i=1:cnt1
+    <span class="keyword">for</span> j=1:cnt2
+        fprintf(<span class="string">"\nBest arrangement of zones is achieved in Zones' Arrangement %d\n"</span>,(idx_z(i,j)));
+
+ fprintf(<span class="string">"The local coordinates in  region1 for best LED position in Zones' Arrangement %d is (%d,%d)\n"</span>,(idx_z(i,j)),(arr_x((idx_z(i,j)),1)),(arr_y((idx_z(i,j)),1)));
+ fprintf(<span class="string">"The local coordinates in  region2 for best LED position in Zones' Arrangement %d is (%d,%d)\n"</span>,(idx_z(i,j)),(arr_x((idx_z(i,j)),2)),(arr_y((idx_z(i,j)),2)));
+ fprintf(<span class="string">"The local coordinates in  region3 for best LED position in Zones' Arrangement %d is (%d,%d)\n"</span>,(idx_z(i,j)),(arr_x((idx_z(i,j)),3)),(arr_y((idx_z(i,j)),3)));
+ fprintf(<span class="string">"The local coordinates in  region4 for best LED position in Zones' Arrangement %d is (%d,%d)\n"</span>,(idx_z(i,j)),(arr_x((idx_z(i,j)),4)),(arr_y((idx_z(i,j)),4)));
+ fprintf(<span class="string">"The local coordinates in  region5 for best LED position in Zones' Arrangement %d is (%d,%d)\n"</span>,(idx_z(i,j)),(arr_x((idx_z(i,j)),5)),(arr_y((idx_z(i,j)),5)));
+ fprintf(<span class="string">"The local coordinates in  region6 for best LED position in Zones' Arrangement %d is (%d,%d)\n"</span>,(idx_z(i,j)),(arr_x((idx_z(i,j)),6)),(arr_y((idx_z(i,j)),6)));
+
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">
+Zones' Arrangement 1
+Region 1: rows' span:(1, 4)  columns' span: (1, 5)
+Region 2: rows' span:(5, 9)  columns' span: (1, 5)
+Region 3: rows' span:(10, 14)  columns' span: (1, 5)
+Region 4: rows' span:(1, 4)  columns' span: (6, 10)
+Region 5: rows' span:(5, 9)  columns' span: (6, 10)
+Region 6: rows' span:(10, 14)  columns' span: (6, 10)
+
+Zones' Arrangement 2
+Region 1: rows' span:(1, 4)  columns' span: (1, 5)
+Region 2: rows' span:(5, 9)  columns' span: (1, 5)
+Region 3: rows' span:(10, 14)  columns' span: (1, 5)
+Region 4: rows' span:(1, 5)  columns' span: (6, 10)
+Region 5: rows' span:(6, 9)  columns' span: (6, 10)
+Region 6: rows' span:(10, 14)  columns' span: (6, 10)
+
+Zones' Arrangement 3
+Region 1: rows' span:(1, 4)  columns' span: (1, 5)
+Region 2: rows' span:(5, 9)  columns' span: (1, 5)
+Region 3: rows' span:(10, 14)  columns' span: (1, 5)
+Region 4: rows' span:(1, 5)  columns' span: (6, 10)
+Region 5: rows' span:(6, 10)  columns' span: (6, 10)
+Region 6: rows' span:(11, 14)  columns' span: (6, 10)
+
+Zones' Arrangement 4
+Region 1: rows' span:(1, 5)  columns' span: (1, 5)
+Region 2: rows' span:(6, 9)  columns' span: (1, 5)
+Region 3: rows' span:(10, 14)  columns' span: (1, 5)
+Region 4: rows' span:(1, 4)  columns' span: (6, 10)
+Region 5: rows' span:(5, 9)  columns' span: (6, 10)
+Region 6: rows' span:(10, 14)  columns' span: (6, 10)
+
+Zones' Arrangement 5
+Region 1: rows' span:(1, 5)  columns' span: (1, 5)
+Region 2: rows' span:(6, 9)  columns' span: (1, 5)
+Region 3: rows' span:(10, 14)  columns' span: (1, 5)
+Region 4: rows' span:(1, 5)  columns' span: (6, 10)
+Region 5: rows' span:(6, 9)  columns' span: (6, 10)
+Region 6: rows' span:(10, 14)  columns' span: (6, 10)
+
+Zones' Arrangement 6
+Region 1: rows' span:(1, 5)  columns' span: (1, 5)
+Region 2: rows' span:(6, 9)  columns' span: (1, 5)
+Region 3: rows' span:(10, 14)  columns' span: (1, 5)
+Region 4: rows' span:(1, 5)  columns' span: (6, 10)
+Region 5: rows' span:(6, 10)  columns' span: (6, 10)
+Region 6: rows' span:(11, 14)  columns' span: (6, 10)
+
+Zones' Arrangement 7
+Region 1: rows' span:(1, 5)  columns' span: (1, 5)
+Region 2: rows' span:(6, 10)  columns' span: (1, 5)
+Region 3: rows' span:(11, 14)  columns' span: (1, 5)
+Region 4: rows' span:(1, 4)  columns' span: (6, 10)
+Region 5: rows' span:(5, 9)  columns' span: (6, 10)
+Region 6: rows' span:(10, 14)  columns' span: (6, 10)
+
+Zones' Arrangement 8
+Region 1: rows' span:(1, 5)  columns' span: (1, 5)
+Region 2: rows' span:(6, 10)  columns' span: (1, 5)
+Region 3: rows' span:(11, 14)  columns' span: (1, 5)
+Region 4: rows' span:(1, 5)  columns' span: (6, 10)
+Region 5: rows' span:(6, 9)  columns' span: (6, 10)
+Region 6: rows' span:(10, 14)  columns' span: (6, 10)
+
+Zones' Arrangement 9
+Region 1: rows' span:(1, 5)  columns' span: (1, 5)
+Region 2: rows' span:(6, 10)  columns' span: (1, 5)
+Region 3: rows' span:(11, 14)  columns' span: (1, 5)
+Region 4: rows' span:(1, 5)  columns' span: (6, 10)
+Region 5: rows' span:(6, 10)  columns' span: (6, 10)
+Region 6: rows' span:(11, 14)  columns' span: (6, 10)
+
+
+Room: Kitchen
+
+Best arrangement of zones is achieved in Zones' Arrangement 5
+The local coordinates in  region1 for best LED position in Zones' Arrangement 5 is (2,3)
+The local coordinates in  region2 for best LED position in Zones' Arrangement 5 is (2,3)
+The local coordinates in  region3 for best LED position in Zones' Arrangement 5 is (2,3)
+The local coordinates in  region4 for best LED position in Zones' Arrangement 5 is (2,3)
+The local coordinates in  region5 for best LED position in Zones' Arrangement 5 is (2,3)
+The local coordinates in  region6 for best LED position in Zones' Arrangement 5 is (2,3)
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2018b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+clc
+clear all
+count=0;
+
+%zone max dimensions
+z_x=5;z_y=5;
+N1=(z_x-1);N2=(z_y-1);
+
+arr_x=[];
+arr_y=[];
+
+% PART 2: best LED
+
+photo=[0 0 160	209	223	221	201 
+0 0 237	268	262	211	186
+0 0 266	273	271	269	198
+0 0 278	280	272	256	192
+0 0 192	262	248	237	178];
+
+kitchen=[0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5
+0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5
+0.5	0.5	4	0.5	0.5	0.5	0.5	0.5	4	0.5	0.5	0.5	0.5	0.5
+0.5	0.5	4	3	3	3	3	3	6	2	1	1	0.5	0.5
+0.5	0.5	1	0.5	0.5	0.5	0.5	0.5	4	3	3	3	0.5	0.5
+0.5	0.5	1	0.5	0.5	0.5	0.5	0.5	3	1	1	0.5	0.5	0.5
+0.5	0.5	3	2	2	2	2	2	3	1	1	0.5	0.5	0.5
+0.5	0.5	3	0.5	0.5	0.5	0.5	0.5	2	1	1	0.5	0.5	0.5
+0.5	0.5	4	1	1	1	1	1	2	3	4	4	0.5	0.5
+0.5	0.5	4	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5	0.5];
+
+
+z_best=zeros(500,1);
+
+
+%PART 1 : Exhaustive zones' arrangement finding
+	
+	for R1=1:7
+	
+		for C1=1:7
+		
+			for R2=(R1+1):(R1+8)
+			
+				for C2=1:7
+				
+				
+					
+						for C3=1:7
+						
+							for R4=1:7
+							
+								
+								
+									for R5=(R4+1):(R4+8)
+									
+									
+													
+													if(((R1-1)<=N1)&&((R2-(R1+1))<=N1)&&((14-(R2+1))<=N1)&&((R4-(1))<=N1)&&((R5-(R4+1))<=N1)&&((14-(R5+1))<=N1)&&((C1-(1))<=N2)&&((C2-(1))<=N2)&&((C3-(1))<=N2)&&((10-(C1+1))<=N2)&&((10-(C2+1))<=N2)&&((10-(C3+1))<=N2))
+														count=count+1;
+%                                                         
+                                    
+														fprintf("\nZones' Arrangement %d\n",count);
+														r1=1;c1=1;r2=(R1+1);c2=1;r3=(R2+1);R3=14;c3=1;r4=1;c4=(C1+1);C4=10;r5=(R4+1);c5=(C2+1);C5=10;r6=(R5+1);R6=14;c6=(C3+1);C6=10;
+% 														
+% 														
+%                                                         
+                                                        fprintf("Region 1: rows' span:(%d, %d)  columns' span: (%d, %d)\n",r1,R1,c1,C1);
+														fprintf("Region 2: rows' span:(%d, %d)  columns' span: (%d, %d)\n",r2,R2,c2,C2);
+														fprintf("Region 3: rows' span:(%d, %d)  columns' span: (%d, %d)\n",r3,R3,c3,C3);
+														fprintf("Region 4: rows' span:(%d, %d)  columns' span: (%d, %d)\n",r4,R4,c4,C4);
+														fprintf("Region 5: rows' span:(%d, %d)  columns' span: (%d, %d)\n",r5,R5,c5,C5);
+														fprintf("Region 6: rows' span:(%d, %d)  columns' span: (%d, %d)\n",r6,R6,c6,C6);
+%Region 1                                                        
+m=1;                                                        
+n=1;
+
+X1=zeros((C1-c1+1),(R1-r1+1));
+
+for i=(11-C1):(11-c1)
+    n=1;
+    for j=r1:R1
+        
+        X1(m,n)=kitchen(i,j);
+        n=n+1;
+    end
+    m=m+1;
+end
+
+
+
+fil2_1=filter2(photo,X1);
+
+y1=max(max(fil2_1));
+
+[idx1_1 idx2_1]=find(fil2_1==y1);
+ 
+figure(count);
+blah=sprintf("Kitchen\nZones' Arrangement %d",(count));
+sgt=sgtitle(blah);
+sgt.FontSize=15;
+
+subplot(2,3,4)
+surfl(fil2_1);
+title('Region 1');
+zlabel('Correlation matrix value');
+xlabel('Local X','Rotation',15);
+ylabel('Local Y','Rotation',-32);
+
+%Region 2                                                        
+m=1;                                                        
+n=1;
+
+X2=zeros((C2-c2+1),(R2-r2+1));
+
+for i=(11-C2):(11-c2)
+    n=1;
+    for j=r2:R2
+        
+        X2(m,n)=kitchen(i,j);
+        n=n+1;
+    end
+    m=m+1;
+end
+
+
+
+fil2_2=filter2(photo,X2);
+
+y2=max(max(fil2_2));
+
+[idx1_2 idx2_2]=find(fil2_2==y2);
+
+subplot(2,3,5)
+surfl(fil2_2);
+title('Region 2');
+zlabel('Correlation matrix value');
+xlabel('Local X','Rotation',15);
+ylabel('Local Y','Rotation',-32);
+
+
+%Region 3                                                        
+m=1;                                                        
+n=1;
+
+X3=zeros((C3-c3+1),(R3-r3+1));
+
+for i=(11-C3):(11-c3)
+    n=1;
+    for j=r3:R3
+        
+        X3(m,n)=kitchen(i,j);
+        n=n+1;
+    end
+    m=m+1;
+end
+
+
+
+fil2_3=filter2(photo,X3);
+
+y3=max(max(fil2_3));
+
+[idx1_3 idx2_3]=find(fil2_3==y3);
+
+subplot(2,3,6)
+surfl(fil2_3);
+zlabel('Correlation matrix value');
+xlabel('Local X','Rotation',15);
+ylabel('Local Y','Rotation',-32);
+title('Region 3');
+
+
+%Region 4                                                        
+m=1;                                                        
+n=1;
+
+X4=zeros((C4-c4+1),(R4-r4+1));
+
+for i=(11-C4):(11-c4)
+    n=1;
+    for j=r4:R4
+        
+        X4(m,n)=kitchen(i,j);
+        n=n+1;
+    end
+    m=m+1;
+end
+
+
+
+fil2_4=filter2(photo,X4);
+
+y4=max(max(fil2_4));
+
+[idx1_4 idx2_4]=find(fil2_4==y4);
+
+subplot(2,3,1)
+surfl(fil2_4);
+title('Region 4');
+zlabel('Correlation matrix value');
+xlabel('Local X','Rotation',15);
+ylabel('Local Y','Rotation',-32);
+
+%Region 5                                                        
+m=1;                                                        
+n=1;
+
+X5=zeros((C5-c5+1),(R5-r5+1));
+
+for i=(11-C5):(11-c5)
+    n=1;
+    for j=r5:R5
+        
+        X5(m,n)=kitchen(i,j);
+        n=n+1;
+    end
+    m=m+1;
+end
+
+
+
+
+fil2_5=filter2(photo,X5);
+
+y5=max(max(fil2_5));
+
+[idx1_5 idx2_5]=find(fil2_5==y5);
+
+subplot(2,3,2)
+surfl(fil2_5);
+title('Region 5');
+zlabel('Correlation matrix value');
+xlabel('Local X','Rotation',15);
+ylabel('Local Y','Rotation',-32);
+
+
+%Region 6                                                        
+m=1;                                                        
+n=1;
+
+X6=zeros((C6-c6+1),(R6-r6+1));
+
+for i=(11-C6):(11-c6)
+    n=1;
+    for j=r6:R6
+        
+        X6(m,n)=kitchen(i,j);
+        n=n+1;
+    end
+    m=m+1;
+end
+
+
+
+fil2_6=filter2(photo,X6);
+
+y6=max(max(fil2_6));
+
+subplot(2,3,3)
+surfl(fil2_6);
+title('Region 6');
+zlabel('Correlation matrix value');
+xlabel('Local X','Rotation',15);
+ylabel('Local Y','Rotation',-32);
+
+[idx1_6 idx2_6]=find(fil2_6==y6);
+z_best(count)=(y1+y2+y3+y4+y5+y6);
+
+ idx_y=[idx1_1 idx1_2 idx1_3  idx1_4 idx1_5 idx1_6];
+ idx_x=[idx2_1 idx2_2 idx2_3  idx2_4 idx2_5 idx2_6];
+
+ arr_x=[arr_x;idx_x];
+ arr_y=[arr_y;idx_y];
+
+
+
+
+
+
+
+
+                                                    end
+													
+ 
+    
+                                                        
+													 end
+												 end
+											end
+										end
+									end
+								end
+    end
+
+                            
+    best_z=max(z_best);
+    idx_z=[];
+idx_z=[idx_z;(find(z_best==best_z))];
+[cnt1,cnt2]=size(idx_z);
+cnt1;
+cnt2;
+
+fprintf("\n\nRoom: Kitchen\n");
+
+
+for i=1:cnt1
+    for j=1:cnt2
+        fprintf("\nBest arrangement of zones is achieved in Zones' Arrangement %d\n",(idx_z(i,j)));
+ 
+ fprintf("The local coordinates in  region1 for best LED position in Zones' Arrangement %d is (%d,%d)\n",(idx_z(i,j)),(arr_x((idx_z(i,j)),1)),(arr_y((idx_z(i,j)),1)));
+ fprintf("The local coordinates in  region2 for best LED position in Zones' Arrangement %d is (%d,%d)\n",(idx_z(i,j)),(arr_x((idx_z(i,j)),2)),(arr_y((idx_z(i,j)),2)));
+ fprintf("The local coordinates in  region3 for best LED position in Zones' Arrangement %d is (%d,%d)\n",(idx_z(i,j)),(arr_x((idx_z(i,j)),3)),(arr_y((idx_z(i,j)),3)));
+ fprintf("The local coordinates in  region4 for best LED position in Zones' Arrangement %d is (%d,%d)\n",(idx_z(i,j)),(arr_x((idx_z(i,j)),4)),(arr_y((idx_z(i,j)),4)));
+ fprintf("The local coordinates in  region5 for best LED position in Zones' Arrangement %d is (%d,%d)\n",(idx_z(i,j)),(arr_x((idx_z(i,j)),5)),(arr_y((idx_z(i,j)),5)));
+ fprintf("The local coordinates in  region6 for best LED position in Zones' Arrangement %d is (%d,%d)\n",(idx_z(i,j)),(arr_x((idx_z(i,j)),6)),(arr_y((idx_z(i,j)),6)));
+    
+    end
+end
+
+
+##### SOURCE END #####
+--></body></html>
